@@ -2,6 +2,10 @@
 
 require 'octokit'
 
+# OctokitClient class encapsulates the logic for searching GitHub repositories, handling pagination,
+# and filtering repositories with no content.
+# When you call the call method, it performs these actions
+# and returns the relevant data for further processing in your application.
 class OctokitClient
   PER_PAGE = 30
 
