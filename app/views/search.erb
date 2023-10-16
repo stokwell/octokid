@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="section">
+    <p>Search results for <b><%= query %></b>.</p>
+    <p>Found <b><%= total_count %></b> repositories.</p>
+    <p>The GitHub API limits searches to 1000 results.</p>
+  </div>
+  <div class="section">
+    <ul>
+      <% repos.each do |repo| %>
+        <li>
+          <%= partial(:repo, repo: repo) %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+    <div class="section">
+      <nav class="pagination is-rounded is-small" role="navigation" aria-label="pagination">
+        <ul class="pagination-list">
+          <% pages.each do |link| %>
+            <li>
+              <a href="/search?query=<%= query %>&page=<%= link %>"
+              class="pagination-link">
+                <%= link %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+  </div>
