@@ -1,0 +1,17 @@
+---
+- name: Restart Docker
+  ansible.builtin.service:
+    name: docker.service
+    state: restarted
+  notify: Get facts about Docker bridge
+
+- name: Get facts about Docker bridge
+  ansible.builtin.setup:
+    gather_subset:
+      - interfaces
+  when: docker_enable_secure_bridge is defined and not docker_enable_secure_bridge
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved.service
+    state: restarted

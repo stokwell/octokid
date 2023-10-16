@@ -1,0 +1,36 @@
+version: "3.3"
+
+services:
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=true"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=stokwell1@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  octokid:
+    image: stokwell/octokid:0.1
+    container_name: octokid_sinatra_app
+    command: ["bundle","exec","rackup","--host","0.0.0.0","--port","4000"]
+    ports: 
+      - "4000:4000"
+    environment:
+      - RACK_ENV=development
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.octokid.rule=Host(`octokid.stokwell.cloud`)"
+      - "traefik.http.routers.octokid.entrypoints=websecure"
+      - "traefik.http.routers.octokid.tls.certresolver=myresolver"
+networks:
+  web:

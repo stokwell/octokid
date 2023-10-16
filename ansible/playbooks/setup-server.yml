@@ -1,0 +1,14 @@
+---
+- name: Setup Server
+  hosts: servers
+  user: ubuntu
+  become: true
+
+  vars:
+    docker_enable_gvisor: true
+    docker_enable_secure_bridge: true
+
+  roles:
+    - role: docker
+    - role: traefik
+    # - role: octokid

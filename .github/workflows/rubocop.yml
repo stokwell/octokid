@@ -1,0 +1,35 @@
+name: Run rubocop linter
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  rubocop:
+    name: Run rubocop
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+
+      - name: Install Bundler
+        run: gem install bundler
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run RuboCop
+        run: bundle exec rubocop
+
+      - name: Upload RuboCop report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: rubocop-results
+          path: tmp/rubocop-report.json 
+
