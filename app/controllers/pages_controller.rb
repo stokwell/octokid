@@ -3,8 +3,6 @@
 require_relative '../../lib/octokit_client'
 
 class PagesController < ApplicationController
-  PER_PAGE = 30
-
   get '/' do
     erb :index
   end

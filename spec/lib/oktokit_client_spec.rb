@@ -7,9 +7,9 @@ RSpec.describe OctokitClient do
   describe '#call' do
     let(:query) { 'ruby' }
     let(:page) { 1 }
+    let(:client) { OctokitClient.new(query, page) }
 
-    before do 
-      client = OctokitClient.new(query, page)
+    before do
       allow(client).to receive(:search_github_repositories).and_return(
         total_count: 50,
         items: [{ size: 100 }, { size: 0 }, { size: 50 }]
