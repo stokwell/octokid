@@ -1,0 +1,11 @@
+<div class="box mg">
+  <article class="media">
+    <div class="media-content">
+      <div class="content">
+        <p><strong><%= repo.name %> </strong><small><%= repo.owner.login %></small> <small><%= repo.stargazers_count %> stars</small></p>
+				<p><%= repo.description %></p>
+			  <p><a href=<%= repo.html_url %>><%= repo.html_url %></a></p>
+      </div>
+    </div>
+  </article>
+</div>
