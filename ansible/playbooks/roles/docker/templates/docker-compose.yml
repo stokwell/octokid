@@ -1,0 +1,15 @@
+version: '3'
+services:
+  sinatra:
+    image: stokwell/octokid:latest
+    command: ["bundle","exec","rackup","--host","0.0.0.0","--port","4000"]
+    environment:
+      - RACK_ENV=production
+  nginx:
+    image: stokwell/octokid_nginx:latest
+    ports:
+      - 8080:80
+    links:
+      - sinatra
+    depends_on:
+      - sinatra

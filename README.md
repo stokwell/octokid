@@ -44,3 +44,47 @@ You can run the tests using the following command:
 ```bash
 rspec spec
 ```
+
+# Continuous Integration & Deployment
+
+## Overview
+
+Continuous Integration (CI) and Continuous Deployment (CD) are crucial aspects of our development process. These practices help ensure the reliability and consistency of our software and streamline the deployment process. In this section, we'll outline the tools, workflows, and strategies we've adopted for CI/CD.
+
+## GitHub Actions
+
+### RSpec Workflow
+
+Our CI/CD process begins with the RSpec workflow, triggered on every push to any branch. This workflow employs GitHub Actions to run our test suite using RSpec. This step helps us ensure the correctness of our codebase by running unit and integration tests.
+
+### Docker Workflow
+
+The Docker workflow is triggered on every push to the `master` and `deployment` branches. This workflow takes care of building a Docker image of our Octokit app, logging in to the Dockerhub repository, and pushing the built image. This enables us to maintain containerized versions of our application for deployment.
+
+## Deployment Process
+
+### Linode Instance
+
+To deploy our Octokit app, we create a Linode Instance using Terraform. This cloud instance provides a scalable and reliable environment for running our application. Additionally, we add an SSH key to this instance, which is required for secure communication and management using Ansible.
+
+### Ansible Playbooks
+
+We utilize Ansible, an automation tool, to configure and provision our Linode server. Two Ansible playbooks are used:
+
+1. The first playbook installs and configures Docker and Docker Compose on the server. This allows us to manage containerized applications easily.
+
+2. The second playbook configures and starts Traefik, a reverse proxy and load balancer, and our Octokit app using `docker-compose` commands. Traefik plays a vital role in routing incoming requests and managing SSL certificates.
+
+### SSL with Let's Encrypt
+
+To secure our application and enable HTTPS on the host, we leverage Let's Encrypt, a trusted certificate authority. Let's Encrypt provides free SSL/TLS certificates, ensuring data encryption and secure communication between users and our application.
+
+## Ongoing Improvements
+
+Please note that our Continuous Integration & Deployment setup is an ongoing effort. We use it for demonstration and learning purposes, but it requires further refinements and considerations, especially regarding security:
+
+- **User Permissions**: For enhanced security, we aim to create a dedicated user for Docker with limited privileges. This user should have permissions only to execute necessary Docker commands.
+
+- **Private Docker Repository**: Storing Docker images in a private repository adds an extra layer of security. It limits access to our images and prevents unauthorized use.
+
+By addressing these aspects and continuously improving our CI/CD process, we ensure a robust and secure deployment pipeline for our Octokit app.

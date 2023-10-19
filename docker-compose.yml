@@ -1,0 +1,10 @@
+version: '3'
+services:
+  sinatra:
+    build: 
+      context: .
+    command: ["bundle","exec","rackup","--host","0.0.0.0","--port","4000"]
+    ports:
+      - "4000:4000"
+    environment:
+      - RACK_ENV=production

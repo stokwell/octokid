@@ -1,0 +1,7 @@
+[all:vars]
+ansible_user=ubuntu
+
+[servers]
+
+server ansible_host=139.144.77.100 ansible_user=root ansible_ssh_private_key_file=~/.ssh/linode
+

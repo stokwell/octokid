@@ -1,0 +1,24 @@
+---
+- name: Create Traefik Configuration Directory
+  file:
+    path: /etc/traefik
+    state: directory
+    mode: u=rwx,g=rx,o=rx
+
+- name: Adding traefik.yml file
+  template:
+    src: traefik.yml
+    dest: /etc/traefik/traefik.yml
+    mode: 0600
+
+- name: Create the web network
+  docker_network:
+    name: web
+
+- name: Copy Traefik docker-compose.yml
+  template:
+    src: docker-compose.yml
+    dest: docker-compose.yml
+
+- name: Start Traefik and Octokit app with docker-compose
+  command: docker-compose up -d

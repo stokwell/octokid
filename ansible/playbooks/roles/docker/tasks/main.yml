@@ -1,0 +1,123 @@
+---
+- name: Create keyring directory
+  ansible.builtin.file:
+    path: /usr/local/share/keyrings
+    state: directory
+    mode: u=rwx,g=rx,o=rx
+
+- name: Create empty keyring file to be used by apt_key for Docker
+  ansible.builtin.copy:
+    content: ""
+    force: false
+    mode: u=rw,g=r,o=r
+    dest: /usr/local/share/keyrings/docker-archive-keyring.gpg
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    keyring: /usr/local/share/keyrings/docker-archive-keyring.gpg
+    keyserver: keyserver.ubuntu.com
+    state: present
+
+- name: Add Docker repo
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg]
+      https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename | lower }} stable
+    state: present
+
+- name: Create empty keyring file to be used by apt_key for gVisor
+  ansible.builtin.copy:
+    content: ""
+    force: false
+    mode: u=rw,g=r,o=r
+    dest: /usr/local/share/keyrings/gvisor-archive-keyring.gpg
+  when: docker_enable_gvisor is not defined or docker_enable_gvisor
+
+- name: Add gVisor GPG key
+  ansible.builtin.apt_key:
+    id: 6F1DF85E3A71C24918E727D56FC6D554E32BD943
+    keyring: /usr/local/share/keyrings/gvisor-archive-keyring.gpg
+    url: https://gvisor.dev/archive.key
+    state: present
+  when: docker_enable_gvisor is not defined or docker_enable_gvisor
+
+- name: Add gVisor repo
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/local/share/keyrings/gvisor-archive-keyring.gpg] https://storage.googleapis.com/gvisor/releases release main
+    state: present
+  when: docker_enable_gvisor is not defined or docker_enable_gvisor
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose
+    state: present
+
+- name: Install gVisor package
+  ansible.builtin.apt:
+    name:
+      - runsc
+    state: present
+  when: docker_enable_gvisor is not defined or docker_enable_gvisor
+
+- name: Install CND package
+  ansible.builtin.apt:
+    name:
+      - containernetworking-plugins
+    state: present
+  when: docker_enable_secure_bridge is not defined or docker_enable_secure_bridge
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker.service
+    enabled: true
+    state: started
+
+- name: Execute all handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Write the Docker Daemon config file
+  ansible.builtin.template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: u=rw,g=r,o=r
+  notify: Restart Docker
+
+- name: Create CNI config directory
+  ansible.builtin.file:
+    path: /etc/docker/cni
+    state: directory
+    mode: u=rwx,g=rx,o=rx
+  when: docker_enable_secure_bridge is not defined or docker_enable_secure_bridge
+
+- name: Copy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml
+    dest: docker-compose.yml
+
+# - name: Start the application with docker-compose
+#   ansible.builtin.shell: docker-compose up -d
+
+
+# - name: Write the CNI config file
+#   ansible.builtin.template:
+#     src: secure-bridge.conflist
+#     dest: /etc/docker/cni/secure-bridge.conflist
+#     mode: u=rw,g=r,o=r
+#   notify: Restart Docker
+#   when: docker_enable_secure_bridge is not defined or docker_enable_secure_bridge
+
+# - name: Configure systemd-resolved to listen on Docker bridge
+#   community.general.ini_file:
+#     path: /etc/systemd/resolved.conf
+#     create: false
+#     section: Resolve
+#     option: DNSStubListenerExtra
+#     values:
+#       "{{ [ansible_docker0.ipv4.address] + ansible_docker0.ipv6 | map(attribute='address') }}"
+#   notify: Restart systemd-resolved
+#   when: docker_enable_secure_bridge is defined and not docker_enable_secure_bridge
