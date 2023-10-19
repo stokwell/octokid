@@ -88,5 +88,3 @@ Please note that our Continuous Integration & Deployment setup is an ongoing eff
 - **Private Docker Repository**: Storing Docker images in a private repository adds an extra layer of security. It limits access to our images and prevents unauthorized use.
 
 By addressing these aspects and continuously improving our CI/CD process, we ensure a robust and secure deployment pipeline for our Octokit app.
-
-
