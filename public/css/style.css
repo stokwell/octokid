@@ -1,0 +1,21 @@
+body {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+.wrapper {
+	flex: 1;
+}
+
+.bd-navbar {
+  padding: 1rem 2rem;
+  background-color: whitesmoke;
+}
+.box {
+  margin-bottom: 2rem;
+}
+
+.footer {
+  padding: 1rem 2rem;
+}
+
